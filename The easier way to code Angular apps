@@ -1,0 +1,476 @@
+Joshua Morony
+The easier way to code Angular apps
+Jan 11, 2023  Reactive/Declarative Programming
+Ever hear about "declarative" coding or "reactive" coding? These are concepts I struggled to properly understand and appreciate for a long time. This video aims to give a brief explanation that gets right to the heart of what this is all about and why it is beneficial.
+
+Get weekly content and tips exclusive to my newsletter: 
+https://mobirony.ck.page/4a331b9076 
+
+Learn Angular with Ionic: https://ionicstart.com
+
+0:00 Introduction
+1:38 What is declarative?
+3:57 Why observables?
+4:24 This is still imperative
+6:06 Declarative version
+7:54 The benefit
+8:23 Imperative is not bad
+
+#ionic #angular
+
+- More tutorials: https://eliteionic.com
+- Follow me on Twitter: https://twitter.com/joshuamorony
+
+Transcript
+Introduction
+from the time I learned angular up until
+a year or two ago I like most other
+angular developers coded imperatively I
+kept hearing about coding 
+declaratively
+and coding 
+reactively 
+but it took me a
+long time to get a solid grasp on what
+that actually means when I did start to
+understand it though the quality of my
+code and my enjoyment in writing it
+increased dramatically the concepts
+seemed much more natural and intuitive
+now and coding imperatively by
+comparison actually feels painful now
+but getting to that point was not easy
+so in this video I am aiming to give you
+the brief and simple explanation of
+declarative
+ code and its relationship to
+reactive
+ coding that I feel like I
+needed right at the beginning so when
+you first start looking into this stuff
+you will likely come across the
+explanation that when we code
+imperatively 
+we are saying how we want
+to do something whereas when we code
+
+declaratively 
+we are saying 
+what we want
+or 
+what something is 
+
+the classic example
+given is that imperative code often
+looks like this where we have an
+explicit set of instructions that are
+followed to achieve something in a way
+that is very computer-like the example
+you often see for 
+declarative code is
+that of an 
+SQL statement like this so
+this doesn't say how to get the data
+from the database it just describes what
+we want on a more human level so this is
+all true enough but it's also super
+vague and high level my problem was how
+do I take this declarative concept and
+apply it to my angular code and what do
+observables and 
+not subscribing to them
+have to do with all of this 
+
+
+What is declarative?
+so let's
+jump into some code and take a look at
+an overly simplistic example to get
+right to the heart of what coding
+declaratively 
+in angular means so I have
+this class member called 
+itemsLeftInStock
+ and I assign It Whatever value is
+returned by this method so is this
+declarative or is it imperative so to
+some degree what is more or less
+declarative is up to interpretation but
+a key thing to consider in whether
+something like this is declarative is
+whether we can look at this declaration
+and understand what items left in stock
+is without having to look at other parts
+of this component for additional context
+so I can look at this one line and see
+the items left in stock is just whatever
+is returned by this method so that seems
+pretty declarative right 
+the problem
+here is that there is no guarantee this
+value won't be changed somewhere else in
+the code 
+for example presumably if some
+item is purchased the itemsLeftInStock will change so 
+maybe we do
+something like this now 
+we no longer
+have the full picture of what items left
+in stock is just by looking at this
+declaration we have to search through
+this code to see where it is referenced
+and see how we are changing that value
+so not only does this make it a little
+bit harder to understand what items left
+in stock is it also relies on us
+manually remembering to update this
+value whenever the stock level changes
+so it seems like this value is supposed
+to be the current items left in stock
+but if we buy something and forget to
+update this value then it no longer
+accurately reflects the 
+itemsLeftInStock
+ which is why with this imperative
+style code it becomes important for us
+to take in the broader context of this
+entire component to understand what this
+is we can't just trust that it will live
+up to its name of items left in stock so
+one way I could force this to be
+declarative 
+is to do something like this
+so by adding the 
+readonly 
+keyword 
+
+I now
+know that items left in stock can't
+change and so I do have the full context
+of what this is just by looking at this
+single line here but this doesn't really
+work because we do need to change this
+value and now our buy item method isn't
+going to work 
+
+
+Why observables?
+so this is where the
+concept of rxjs and observables and
+specifically 
+not subscribing to them
+manually comes into play so the
+observable is what allows us to
+declaratively code what something is but
+it still allows the value of that
+something to change over time so rather
+than dealing directly with the values we
+deal with the method of observation that
+controls how that value changes over
+time 
+so let's expand this example a bit
+This is still imperative
+and try to use an observable to make our
+code more declarative and the initial
+version we create is still actually
+going to be imperative 
+this is an
+important aspect to understand because
+just using an observable doesn't make
+your code declarative so a key
+difference now is that rather than
+manually updating the stock level within
+this component 
+
+we have this observable
+stream
+that will emit the new values for us so
+this is useful but this particular
+implementation has some flaws and we've
+also introduced a new requirement here
+so we are going to utilize this in the
+template to 
+enable or disable a button
+based on whether there is stock
+available so this 
+canPurchase
+ flag is
+based on the items left in stock 
+but the
+problem we have is that this value is
+sort of trapped inside of the observable
+Stream 
+So to determine how to set can
+purchase we need to get it out by
+subscribing to it and then we are
+imperatively setting both of those
+values like this and since we have added
+this manual subscription that also means
+we need some kind of strategy for
+unsubscribing which is why we also have
+this destroy Notifier that will emit
+when the 
+ngOnDestroy
+lifecycle Hook is
+triggered and this observable will
+automatically unsubscribe when that
+destroy observable emits so we are used
+using observables here 
+but this is still
+very much imperative 
+
+I definitely cannot
+just look at these declarations here to
+understand what items left in stock and
+canPurchase are because they aren't
+even defined at this point I need to
+check what is happening in the rest of
+the code to understand how those values
+are changed 
+
+
+Declarative version
+so to make this code more
+declarative we could change it to this
+instead 
+so now rather than manually
+subscribing to observable streams to get
+their values out 
+we are using rxjs
+operators like the 
+
+map
+
+here to
+declaratively Define how the values
+should be computed 
+instead of working
+directly with the values themselves 
+we
+are now just working with streams items
+left in stock is just this stream
+returned from our items service and
+there is nothing else in this component
+that we need to know about and this can
+purchase stream is derived from the
+items left in stockstream but again
+everything we need to know about it is
+contained right here 
+we don't need to
+search through the rest of the code to
+understand what 
+canPurchase
+ is so our
+canPurchase
+ stream takes values from
+the items left in stockstream and then
+modifies it to either be true or false
+depending on whether the itemsLeftInStock value is above zero or not 
+so this
+declaration here does reference code
+somewhere else in the component it's
+referencing the other stream here 
+but it
+is very clearly pointing to the
+dependency that it has on it we don't
+need to search through this code for
+every place where 
+canPurchase
+ is
+mentioned because its entire definition
+including what it depends on is
+contained right here 
+we're not going to
+run into a situation where some code
+buried further down in this component is
+going to change this in some surprising
+way 
+we know exactly what it does up
+front so this is 
+declarative 
+we now also
+don't need to worry about handling the
+subscription manually as we are just
+able to pass this stream into the
+template And subscribe to it with the
+async pipe 
+and that is going to handle
+unsubscribing from the stream
+automatically for us 
+
+
+The benefit
+so the benefit of
+this effect only compounds when we have
+more and more state that depends on each
+other whenever one thing Upstream
+changes everything Downstream from that
+automatically updates and that is what
+is meant by 
+reactivity
+ or 
+reactive
+coding 
+
+something changes and then things
+react to it so this code doesn't rely on
+us remembering to manually update things
+so not only is this code shorter and
+easier to understand it is also much
+less prone to bugs 
+
+
+Imperative is not bad
+so one final
+important thing to keep in mind is that
+imperative code is not inherently bad
+
+declarative code is just an abstraction
+on top of imperative code 
+it's higher
+level code that can make coding easier
+and less error prone but at some point
+beneath the surface imperative code is
+still required and if you are working at
+lower levels and imperative code will
+absolute really be required 
+this SQL
+statement does not just magically work
+somewhere it needs imperative code
+beneath the surface to actually retrieve
+those records from a database 
+but at the
+level of building applications I'm a
+strong advocate for declarative and
+reactive code as a way to improve the
+quality of your code and your sanity in
+building and maintaining it so there is
+more to know about declarative code even
+in the context of angular specifically
+but I think what we have covered in this
+video gets to the heart of what it is
+all about 
+so if you found this video
+useful please consider leaving a like or
+subscribe before you go and if you are
+interested in learning a lot more about
+this style of coding in angular feel
+free to check out my 
+ionixtart.com
+
+course in the description where we build
+mobile applications with angular using
+the ionic UI framework
+
+
+
+121 Comments
+Patrick Chasco
+Patrick Chasco
+4 months ago
+Observables and RxJS operators are a game changer. 
+
+That being said, RxJS is also a powerful foot-gun and it is easy to get yourself into a situation where your declarative pipes are every bit as convoluted and even harder to debug than straightforward imperative code. This is especially true when combining observables.
+27
+Jason Rooney
+Jason Rooney
+4 months ago
+I think the key reason you should work declaratively as much as possible is that your main goal with any component should be to minimize state as much as possible. That means as few writable or mutable public properties as humanly possible within your component. This holds true for any component based web framework.
+10
+LowrollerWTF
+LowrollerWTF
+4 months ago (edited)
+I found this video incredibly useful. 6 months after switching to Angular from React I am not declarative 100% but I end up always subscribe to observablels as a part of my brain still tells me that I need to "own" those state values by storing them in variables. The example you are showing here is a lot smoother and shows me I still have along way to go and adjust to this mindset. I would like to become a pro member on your platform but for the moment I am not interested in Ionic but purely on Angular. I was wondering if you have more courses going to be added on that..! Not judging, I think that what you are doing is great is just that I am not into mobile apps rn
+32
+Joshua Morony
+·
+Joshua Morony
+Joshua Morony
+4 months ago
+I am planning to do an "Angular only" flavour of Ionic Start soon, but Ionic Start already is mostly just an Angular course where you are using Ionic UI components instead of something like Material Design components
+9
+Wolf ElectronicS
+Wolf ElectronicS
+4 months ago
+It's sort of interesting to me reading that you switched from React to Angular. These days I normally hear the opposite. 
+I'm glad about that, since I've always preferred Angular over React.
+1
+LowrollerWTF
+LowrollerWTF
+4 months ago (edited)
+ @Wolf ElectronicS  well I ended up leading a team which is experienced in Angular and forcing them to switch to React would've taken too long... However I ended up enjoying the built in tools Angular comes with but there are some things like forms which ended up being way too complicated for what it needs to do really. Also having a route-aware menu in React is as simple as using a hook while in Angular you might end up subscribing to the router events, finding the Navigation end... I mean this is way more verbose than it should be and IMO Angular has some work to do in smoothing some rough edges but so far it has proven to be more reliable than Next JS which would randomly require me to edit bits and pieces of the framework I don't feel I should've touched
+1
+abstract object
+abstract object
+4 months ago
+What I’d be interested in seeing is the proper use of RxJS across React/Vue and of course Angular.
+12
+BGivo
+BGivo
+1 month ago
+You are so great at explaining challenging topics and have really improved your presentation style. When I first saw your videos I was a bit overwhelmed by your focus on ionic, but even then you still had really good Angular content. I see you've recently done a lot more Angular and the quality of your videos is even better now so really excited to see more videos from you. I think you will reach 1 million subscribers. You are special.
+Lương Trần
+Lương Trần
+4 months ago
+Recently, I'm just get into learning how to code reactively and I found your videos super useful. Thank you for all your videos and hope that there will be more about this topic
+3
+Bruno Miguel
+Bruno Miguel
+2 months ago
+I have been down this road myself. One thing I would like to add is that part of the power of this library comes in the form of functional programing. Although the Observer pattern is more flashy because makes it "reactive" it is only one part of the equation the other is in reality functional programming with all the great things it has like pure functions and thus avoiding side effects and of curse like you mention a few times :) makes the code declarative rather than imperative. The declarative part comes from functinal programming and not from Observer pattern.
+Mykola Kozachenko
+Mykola Kozachenko
+3 months ago
+Very nicely explained. The key idea is that a simple variable represents a single value, but a stream represents all of the values at once
+Ostap1974
+Ostap1974
+2 months ago
+Would be interesting to see your view on the corresponding ItemsService implementation, like receiving list of items from server, adding/removing some, sorting etc.
+Dlazzy
+4 months ago
+Really nice video!
+Is it possible to get source code for this? Or at least the service code to handle items stock? Thank you!!
+3
+Martin Krutzfeld
+4 months ago
+Nice. Never heard about the concept, but always intuitively aimed for that.
+
+The data flow must be crystal clear in Angular.
+1
+Disable Blue
+2 months ago
+This video is probably the best to explain declarative. I was struggling to explain declarative to new people  😅
+B J
+3 months ago
+I think for me the distinction between when code is either imperative or declarative comes down to the degree to which a consumer of a resource needs to manage the state of that resource in order to address it’s concerns. So the higher the degree of management of the resource’s state by the consumer, the greater the degree of the imperative nature of the code and vice versa.
+Rudolf Mayer
+4 months ago
+You are probably the sole reason I actually started transitioning to a much more RxJS-accompanied coding and now get frustrated and confused when I see my colleagues' imperative code like * omg Ctrl+F variable name here I come again *
+8
+David O'Riley
+4 months ago
+I like the idea of declarative coding with Rxjs observables. What I'm not crazy over is the possibility of having a bunch of unnecessary *ngIf's in the template just so I can use the async pipe and use the value elsewhere. The ngIf's has some overhead and interferes with rendering, and in the case of falsy values it just wouldn't show the element all of which could lead to some edge cases in prod. Do you know of an effective alternative to the *ngIf + async pipe pattern that avoids this in some way? I am aware of packages like RxAngular and NgRx that have structural let directives which can be used as an alternative. Are those something you've used or would try for a better declarative experience?
+4
+·
+Frank Seidel
+4 months ago
+Great video Josh. What is your approach regarding ion-refresher and the async pipe? Am I right to assume that as long as ion-refresher itself isn't reactive (throws event ionRefresh, no observable to subscribe to) I have to stick to manually subscribe / unsubscribe in the template's code? Because somehwere you have to do the "this.refresher.complete()"
+At least if you don't want to overcomplicate things.
+Giorgi Merabishvili
+4 months ago
+Great video as always. One general question: What are your thoughts regarding Angular for the next few years?   Will it be relevant and popular among Devs and companies or will it lose with React ultimatey?
+2
+·
+The Answer
+4 months ago
+I want more videos like this for common and more complex use cases
+1
+·
+Iago Campos
+4 months ago
+Every time I watch your videos I learn something new. Thanks for the awesome content!
+1
+V V
+2 months ago
+I love the way how you explain things, it is pretty close to me, I can't stop watching 😍
+

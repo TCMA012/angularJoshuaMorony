@@ -1,0 +1,64 @@
+The trick to make any IMPERATIVE code DECLARATIVE instantly
+https://www.youtube.com/watch?v=AReW_ET90KM
+https://github.com/joshuamorony/declarative-wrapper
+Joshua Morony
+Feb 8, 2023
+We don't have control over what 3rd party libraries do, and sometimes those libraries are going to have an imperative API. Here's a little trick you can use to keep your codebase declarative, but still utilise those imperative APIs.
+
+use a directive directly on a template
+
+a component/directive input serves as a nice way to pull in some values from an observable stream with the 
+async pipe and then do the imperative stuff inside that wrapper with simple synchronous input -
+
+
+
+notification-alert.directive.ts
+
+@Directive({
+  selector: 'app-notification-alert',
+})
+export class NotificationAlertDirective implements OnChanges {
+  @Input() message!: string;
+
+  constructor(private alertCtrl: AlertController) {}
+
+  async ngOnChanges(changes: SimpleChanges) {
+    const alert = await this.alertCtrl.create({
+      message: changes['message'].currentValue,
+    });
+
+    alert.present();
+  }
+}
+
+
+
+
+1. if your "component" doesn't have a template (html) then you can make a directive instead of a component. 
+2. You can directly put an ngModule in a directive file instead of a separate file. 
+(I assume that also goes for a component file). I guess that is useful if the ngModule's purpose is to ONLY be for declaring the directive and exporting the directive. 
+
+
+=
+
+use switchmap to change into the angular material modal afterclosed
+
+use mergeMap and from without writing any directive
+I'm not seeing how more operators will avoid the manual subscription.
+
+=
+
+newPlayerAlert$ : Observable<P>;
+
+constructor(..imports) {
+    this.newPlayerALert$ = this.playerService.newPlayers$.pipe(
+        takeUntil(...),
+        tap(player => { ...alert})
+    );
+}
+
+And then inside your HTML:
+
+<ng-container *ngIf="newPlayerAlert | async"></ng-container>
+
+any side effect that you run in a tap operator is imperative (that's fine - but if you are trying to stick to a declarative style, hiding away the imperative stuff behind a declarative API might be preferable)
